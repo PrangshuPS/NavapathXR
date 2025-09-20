@@ -229,7 +229,7 @@ body.features {
   box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 .info-panel h2 {
-  color: #023e8a;
+  color: #00d4aa;
   margin-bottom: 15px;
 }
 .info-buttons {
@@ -239,7 +239,7 @@ body.features {
   padding: 12px 20px;
   border: none;
   border-radius: 6px;
-  background: #0077b6;
+  background: #00d4aa;
   color: white;
   cursor: pointer;
   margin-right: 10px;
@@ -250,15 +250,15 @@ body.features {
 }
 .btn-secondary {
   padding: 12px 20px;
-  border: 1px solid #0077b6;
+  border: 1px solid #00d4aa;
   border-radius: 6px;
   background: transparent;
-  color: #0077b6;
+  color: #00d4aa;
   cursor: pointer;
   transition: all 0.3s;
 }
 .btn-secondary:hover {
-  background: #0077b6;
+  background: #00d4aa;
   color: #fff;
 }
 .stats {
@@ -296,5 +296,6 @@ body.features {
   margin-bottom: 10px;
   color: #00d4aa;
 }
+
 
 
