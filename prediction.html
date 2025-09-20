@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prediction | NAVPATHXR</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Prediction Page Styles */
+    .prediction-hero {
+      background: #f8fffe;
+      padding: 80px 0 60px;
+      border-bottom: 1px solid #e0f2f1;
+    }
+
+    .prediction-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+
+    .prediction-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .prediction-header h1 {
+      font-size: 2.5rem;
+      color: #1e293b;
+      margin-bottom: 20px;
+    }
+
+    .prediction-header .highlight {
+      color: #00d4aa;
+    }
+
+    .prediction-header p {
+      font-size: 1.1rem;
+      color: #64748b;
+      max-width: 700px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* Prediction Interface */
+    .prediction-interface {
+      background: #ffffff;
+      padding: 60px 0;
+    }
+
+    .prediction-config {
+      background: #f8fffe;
+      border-radius: 15px;
+      padding: 40px;
+      margin-bottom: 40px;
+      border: 1px solid #e0f2f1;
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    .prediction-config h2 {
+      color: #00d4aa;
+      font-size: 1.5rem;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .config-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      align-items: end;
+    }
+
+    .config-item label {
+      display: block;
+      color: #1e293b;
+      font-weight: 500;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+    }
+
+    .config-select, .config-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      background: #ffffff;
+      color: #1e293b;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+
+    .config-select:focus, .config-input:focus {
+      outline: none;
+      border-color: #00d4aa;
+      box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.1);
+    }
+
+    .config-button {
+      display: flex;
+      align-items: end;
+    }
+
+    .btn-prediction {
+      background: #00d4aa;
+      color: white;
+      border: none;
+      padding: 14px 30px;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+
+    .btn-prediction:hover {
+      background: #00b894;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(0, 212, 170, 0.3);
+    }
+
+    .btn-prediction:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Prediction Results */
+    .prediction-results {
+      background: #ffffff;
+      border-radius: 15px;
+      padding: 40px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    .results-header {
+      margin-bottom: 30px;
+    }
+
+    .results-header h2 {
+      color: #1e293b;
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+    }
+
+    .results-meta {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+
+    .meta-tag {
+      background: #00d4aa;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .model-accuracy {
+      color: #64748b;
+      font-size: 0.9rem;
+      text-align: right;
+    }
+
+    .results-content {
+      display: grid;
+      gap: 30px;
+    }
+
+    .chart-section {
+      background: #f8fffe;
+      border-radius: 12px;
+      padding: 25px;
+      border: 1px solid #e0f2f1;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .chart-header h3 {
+      color: #1e293b;
+      font-size: 1.2rem;
+      margin: 0;
+    }
+
+    .chart-controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    .export-btn {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      padding: 8px 15px;
+      border-radius: 8px;
+      color: #64748b;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.3s ease;
+    }
+
+    .export-btn:hover {
+      background: #f1f5f9;
+      border-color: #00d4aa;
+      color: #00d4aa;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 400px;
+      background: #ffffff;
+      border-radius: 8px;
+      border: 1px solid #e0f2f1;
+    }
+
+    .prediction-chart {
+      width: 100%;
+      height: 100%;
+      border-radius: 8px;
+    }
+
+    .chart-placeholder, .map-placeholder {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f8fafc;
+      border-radius: 8px;
+      border: 2px dashed #e2e8f0;
+    }
+
+    .placeholder-content {
+      text-align: center;
+      color: #64748b;
+    }
+
+    .placeholder-icon {
+      font-size: 3rem;
+      margin-bottom: 15px;
+    }
+
+    .summary-section {
+      background: #f1f5f9;
+      border-radius: 12px;
+      padding: 25px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .summary-section h3 {
+      color: #1e293b;
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+    }
+
+    .ai-summary {
+      color: #64748b;
+      line-height: 1.6;
+    }
+
+    .anomaly-section, .trajectory-section {
+      background: #fef7f0;
+      border-radius: 12px;
+      padding: 25px;
+      border: 1px solid #fed7aa;
+    }
+
+    .anomaly-section h3, .trajectory-section h3 {
+      color: #ea580c;
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+    }
+
+    .anomaly-results {
+      display: grid;
+      gap: 15px;
+    }
+
+    .anomaly-item {
+      background: #ffffff;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 4px solid #ef4444;
+    }
+
+    .trajectory-map {
+      height: 400px;
+      background: #ffffff;
+      border-radius: 8px;
+      border: 1px solid #fed7aa;
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      border-top-color: transparent;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .prediction-container {
+        padding: 0 20px;
+      }
+      
+      .config-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .chart-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .results-meta {
+        justify-content: center;
+      }
+      
+      .model-accuracy {
+        text-align: center;
+      }
+    }
+
+    /* Footer Styles */
+    .footer {
+      background: #0f172a;
+      color: #94a3b8;
+      padding: 20px 0;
+      font-size: 0.9rem;
+      margin-top: 80px;
+    }
+
+    .footer-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .footer-left {
+      color: #cbd5e1;
+    }
+
+    .footer-right {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      color: #94a3b8;
+    }
+
+    .footer-divider {
+      color: #475569;
+      font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+      .footer-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+      }
+      
+      .footer-right {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .footer-divider {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body class="features">
+  <!-- ===== Navigation Bar ===== -->
+  <header class="navbar">
+    <div class="logo">NAVPATHXR</div>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="features.html">Features</a></li>
+        <li><a href="prediction.html" class="active">Prediction</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- ===== Main Prediction Section ===== -->
+  <section class="prediction-hero">
+    <div class="prediction-container">
+      <div class="prediction-header">
+        <h1>Ocean <span class="highlight">Predictions</span></h1>
+        <p>Leverage AI models to predict ocean conditions, temperature changes, and marine ecosystem patterns based on historical ARGO data and current trends.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Prediction Interface ===== -->
+  <section class="prediction-interface">
+    <div class="prediction-container">
+      
+      <!-- Configure Prediction Section -->
+      <div class="prediction-config">
+        <h2>Configure Prediction</h2>
+        
+        <div class="config-grid">
+          <div class="config-item">
+            <label for="predictionType">Prediction Type</label>
+            <select id="predictionType" class="config-select">
+              <option value="">Select prediction type</option>
+              <option value="temperature">Temperature Forecast</option>
+              <option value="salinity">Salinity Forecast</option>
+              <option value="oxygen">Dissolved Oxygen Forecast</option>
+              <option value="trajectory">Float Trajectory Prediction</option>
+              <option value="anomaly">Anomaly Detection</option>
+            </select>
+          </div>
+
+          <div class="config-item">
+            <label for="timeRange">Time Range</label>
+            <select id="timeRange" class="config-select">
+              <option value="">Select time range</option>
+              <option value="7days">7 Days Forecast</option>
+              <option value="30days">30 Days Forecast</option>
+              <option value="3months">3 Months Forecast</option>
+              <option value="1year">1 Year Projection</option>
+            </select>
+          </div>
+
+          <div class="config-item">
+            <label for="oceanRegion">Ocean Region</label>
+            <select id="oceanRegion" class="config-select">
+              <option value="">Select ocean region</option>
+              <option value="pacific">Pacific Ocean</option>
+              <option value="atlantic">Atlantic Ocean</option>
+              <option value="indian">Indian Ocean</option>
+              <option value="arctic">Arctic Ocean</option>
+              <option value="southern">Southern Ocean</option>
+            </select>
+          </div>
+
+          <div class="config-item">
+            <label for="latitude">Latitude (Optional)</label>
+            <input type="number" id="latitude" class="config-input" placeholder="e.g., 40.7128" step="0.0001" min="-90" max="90">
+          </div>
+
+          <div class="config-item">
+            <label for="longitude">Longitude (Optional)</label>
+            <input type="number" id="longitude" class="config-input" placeholder="e.g., -74.0060" step="0.0001" min="-180" max="180">
+          </div>
+
+          <div class="config-item config-button">
+            <button id="runPrediction" class="btn-prediction">Run Prediction</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Prediction Results Section -->
+      <div class="prediction-results" id="predictionResults" style="display: none;">
+        <div class="results-header">
+          <h2>Prediction Results</h2>
+          <div class="results-meta">
+            <span id="resultRegion" class="meta-tag">Pacific Ocean</span>
+            <span id="resultTimeRange" class="meta-tag">30 Days Forecast</span>
+            <span id="resultConfidence" class="meta-tag">85% Confidence</span>
+          </div>
+          <div class="model-accuracy">
+            <span id="modelAccuracy">Model Accuracy: 87%</span>
+          </div>
+        </div>
+
+        <div class="results-content">
+          <div class="chart-section">
+            <div class="chart-header">
+              <h3 id="chartTitle">Temperature (°C)</h3>
+              <div class="chart-controls">
+                <button class="export-btn" onclick="exportChart()">📊 Export Chart</button>
+                <button class="export-btn" onclick="exportData()">📄 Export Data</button>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="predictionChart" class="prediction-chart"></canvas>
+              <div id="chartPlaceholder" class="chart-placeholder">
+                <div class="placeholder-content">
+                  <div class="placeholder-icon">📈</div>
+                  <p>Prediction chart will appear here</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="summary-section">
+            <h3>AI Summary</h3>
+            <div id="aiSummary" class="ai-summary">
+              <p>Configure and run a prediction to see AI-generated insights about ocean conditions and trends.</p>
+            </div>
+          </div>
+
+          <!-- Anomaly Detection (conditional) -->
+          <div id="anomalySection" class="anomaly-section" style="display: none;">
+            <h3>Anomaly Detection</h3>
+            <div id="anomalyResults" class="anomaly-results">
+              <!-- Anomaly results will be populated here -->
+            </div>
+          </div>
+
+          <!-- Float Trajectory Map (conditional) -->
+          <div id="trajectorySection" class="trajectory-section" style="display: none;">
+            <h3>Float Trajectory Prediction</h3>
+            <div id="trajectoryMap" class="trajectory-map">
+              <div class="map-placeholder">
+                <div class="placeholder-content">
+                  <div class="placeholder-icon">🗺️</div>
+                  <p>Float trajectory map will appear here</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===== Footer ===== -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-left">
+        <span>© 2025 NAVPATHXR. Powered by ARGO data.</span>
+      </div>
+      <div class="footer-right">
+        <span>contact@NAVPATHXR</span>
+        <span class="footer-divider">•</span>
+        <span>Project Credits: Team NAVPATHXR</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Prediction functionality
+    let predictionChart = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const runButton = document.getElementById('runPrediction');
+      const resultsSection = document.getElementById('predictionResults');
+      
+      runButton.addEventListener('click', runPrediction);
+      
+      // Add change listeners for form validation
+      const selects = document.querySelectorAll('.config-select');
+      selects.forEach(select => {
+        select.addEventListener('change', validateForm);
+      });
+      
+      validateForm(); // Initial validation
+    });
+
+    function validateForm() {
+      const predictionType = document.getElementById('predictionType').value;
+      const timeRange = document.getElementById('timeRange').value;
+      const oceanRegion = document.getElementById('oceanRegion').value;
+      const runButton = document.getElementById('runPrediction');
+      
+      const isValid = predictionType && timeRange && oceanRegion;
+      runButton.disabled = !isValid;
+    }
+
+    async function runPrediction() {
+      const runButton = document.getElementById('runPrediction');
+      const resultsSection = document.getElementById('predictionResults');
+      
+      // Get form values
+      const predictionType = document.getElementById('predictionType').value;
+      const timeRange = document.getElementById('timeRange').value;
+      const oceanRegion = document.getElementById('oceanRegion').value;
+      const latitude = document.getElementById('latitude').value;
+      const longitude = document.getElementById('longitude').value;
+      
+      // Show loading state
+      runButton.innerHTML = '<span class="loading-spinner"></span> Running Prediction...';
+      runButton.disabled = true;
+      
+      try {
+        // Simulate API call delay
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Generate mock prediction data
+        const predictionData = generateMockPrediction(predictionType, timeRange, oceanRegion, latitude, longitude);
+        
+        // Display results
+        displayResults(predictionData);
+        
+        // Show results section
+        resultsSection.style.display = 'block';
+        resultsSection.scrollIntoView({ behavior: 'smooth' });
+        
+      } catch (error) {
+        alert('Error running prediction: ' + error.message);
+      } finally {
+        // Reset button
+        runButton.innerHTML = 'Run Prediction';
+        runButton.disabled = false;
+        validateForm();
+      }
+    }
+
+    function generateMockPrediction(type, timeRange, region, lat, lon) {
+      const regions = {
+        pacific: 'Pacific Ocean',
+        atlantic: 'Atlantic Ocean',
+        indian: 'Indian Ocean',
+        arctic: 'Arctic Ocean',
+        southern: 'Southern Ocean'
+      };
+      
+      const timeRanges = {
+        '7days': '7 Days Forecast',
+        '30days': '30 Days Forecast',
+        '3months': '3 Months Forecast',
+        '1year': '1 Year Projection'
+      };
+      
+      const types = {
+        temperature: 'Temperature (°C)',
+        salinity: 'Salinity (PSU)',
+        oxygen: 'Dissolved Oxygen (mg/L)',
+        trajectory: 'Float Trajectory',
+        anomaly: 'Anomaly Detection'
+      };
+      
+      // Generate time series data
+      const dataPoints = type === 'trajectory' ? 0 : (timeRange === '7days' ? 7 : timeRange === '30days' ? 30 : timeRange === '3months' ? 90 : 365);
+      const historicalData = [];
+      const forecastData = [];
+      
+      if (dataPoints > 0) {
+        // Historical data (last 30 days)
+        for (let i = 30; i >= 0; i--) {
+          const date = new Date();
+          date.setDate(date.getDate() - i);
+          
+          let value;
+          switch (type) {
+            case 'temperature':
+              value = 20 + Math.sin(i * 0.1) * 5 + Math.random() * 2 - 1;
+              break;
+            case 'salinity':
+              value = 35 + Math.sin(i * 0.08) * 2 + Math.random() * 0.5 - 0.25;
+              break;
+            case 'oxygen':
+              value = 8 + Math.sin(i * 0.12) * 1.5 + Math.random() * 0.3 - 0.15;
+              break;
+          }
+          
+          historicalData.push({
+            date: date.toISOString().split('T')[0],
+            value: parseFloat(value.toFixed(2))
+          });
+        }
+        
+        // Forecast data
+        for (let i = 1; i <= dataPoints; i++) {
+          const date = new Date();
+          date.setDate(date.getDate() + i);
+          
+          let value;
+          const trend = type === 'temperature' ? 0.01 : type === 'salinity' ? 0.001 : -0.001;
+          const lastValue = i === 1 ? historicalData[historicalData.length - 1].value : forecastData[i - 2].value;
+          
+          value = lastValue + trend * i + Math.sin(i * 0.1) * 0.5 + Math.random() * 0.5 - 0.25;
+          
+          forecastData.push({
+            date: date.toISOString().split('T')[0],
+            value: parseFloat(value.toFixed(2))
+          });
+        }
+      }
+      
+      return {
+        type: types[type],
+        region: regions[region],
+        timeRange: timeRanges[timeRange],
+        confidence: Math.floor(Math.random() * 15 + 80), // 80-95%
+        accuracy: Math.floor(Math.random() * 10 + 85), // 85-95%
+        historicalData,
+        forecastData,
+        coordinates: lat && lon ? { lat: parseFloat(lat), lon: parseFloat(lon) } : null,
+        predictionType: type
+      };
+    }
+
+    function displayResults(data) {
+      // Update meta information
+      document.getElementById('resultRegion').textContent = data.region;
+      document.getElementById('resultTimeRange').textContent = data.timeRange;
+      document.getElementById('resultConfidence').textContent = `${data.confidence}% Confidence`;
+      document.getElementById('modelAccuracy').textContent = `Model Accuracy: ${data.accuracy}%`;
+      document.getElementById('chartTitle').textContent = data.type;
+      
+      // Generate AI summary
+      generateAISummary(data);
+      
+      // Show/hide conditional sections
+      const anomalySection = document.getElementById('anomalySection');
+      const trajectorySection = document.getElementById('trajectorySection');
+      
+      if (data.predictionType === 'anomaly') {
+        anomalySection.style.display = 'block';
+        generateAnomalyResults();
+      } else {
+        anomalySection.style.display = 'none';
+      }
+      
+      if (data.predictionType === 'trajectory') {
+        trajectorySection.style.display = 'block';
+      } else {
+        trajectorySection.style.display = 'none';
+      }
+      
+      // Create chart
+      if (data.predictionType !== 'trajectory' && data.predictionType !== 'anomaly') {
+        createPredictionChart(data);
+      }
+    }
+
+    function createPredictionChart(data) {
+      const canvas = document.getElementById('predictionChart');
+      const placeholder = document.getElementById('chartPlaceholder');
+      
+      if (predictionChart) {
+        predictionChart.destroy();
+      }
+      
+      placeholder.style.display = 'none';
+      canvas.style.display = 'block';
+      
+      const ctx = canvas.getContext('2d');
+      
+      // Combine historical and forecast data for labels
+      const allDates = [...data.historicalData.map(d => d.date), ...data.forecastData.map(d => d.date)];
+      const historicalValues = [...data.historicalData.map(d => d.value), ...Array(data.forecastData.length).fill(null)];
+      const forecastValues = [...Array(data.historicalData.length).fill(null), ...data.forecastData.map(d => d.value)];
+      
+      predictionChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: allDates,
+          datasets: [
+            {
+              label: 'Historical Data',
+              data: historicalValues,
+              borderColor: '#00d4aa',
+              backgroundColor: 'rgba(0, 212, 170, 0.1)',
+              borderWidth: 2,
+              fill: false,
+              pointRadius: 3,
+              pointHoverRadius: 5
+            },
+            {
+              label: 'Forecast',
+              data: forecastValues,
+              borderColor: '#3b82f6',
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              borderWidth: 2,
+              borderDash: [5, 5],
+              fill: false,
+              pointRadius: 3,
+              pointHoverRadius: 5
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            title: {
+              display: true,
+              text: `${data.type} Prediction - ${data.region}`
+            }
+          },
+          scales: {
+            x: {
+              display: true,
+              title: {
+                display: true,
+                text: 'Date'
+              }
+            },
+            y: {
+              display: true,
+              title: {
+                display: true,
+                text: data.type
+              }
+            }
+          },
+          interaction: {
+            intersect: false,
+            mode: 'index'
+          }
+        }
+      });
+    }
+
+    function generateAISummary(data) {
+      const summaryElement = document.getElementById('aiSummary');
+      
+      let summary = '';
+      const trend = data.forecastData.length > 0 ? 
+        (data.forecastData[data.forecastData.length - 1].value > data.historicalData[data.historicalData.length - 1].value ? 'increase' : 'decrease') : 'stable';
+      
+      switch (data.predictionType) {
+        case 'temperature':
+          summary = `Sea surface temperature in the ${data.region} is expected to ${trend} over the ${data.timeRange.toLowerCase()} with ${data.confidence}% model confidence. The prediction model shows ${data.accuracy}% accuracy based on historical ARGO float data.`;
+          break;
+        case 'salinity':
+          summary = `Ocean salinity levels in the ${data.region} are predicted to ${trend} during the ${data.timeRange.toLowerCase()}. Our AI model indicates ${data.confidence}% confidence in this forecast.`;
+          break;
+        case 'oxygen':
+          summary = `Dissolved oxygen concentrations in the ${data.region} are forecasted to ${trend} over the ${data.timeRange.toLowerCase()}, with ${data.confidence}% prediction confidence.`;
+          break;
+        case 'trajectory':
+          summary = `Float trajectory prediction shows expected movement patterns in the ${data.region} over the ${data.timeRange.toLowerCase()}. Current patterns suggest standard circulation routes.`;
+          break;
+        case 'anomaly':
+          summary = `Anomaly detection analysis for the ${data.region} identifies unusual patterns in recent oceanographic data. These anomalies may indicate significant environmental changes.`;
+          break;
+      }
+      
+      if (data.coordinates) {
+        summary += ` Analysis focused on coordinates ${data.coordinates.lat}°N, ${data.coordinates.lon}°E.`;
+      }
+      
+      summaryElement.innerHTML = `<p>${summary}</p>`;
+    }
+
+    function generateAnomalyResults() {
+      const anomalyResults = document.getElementById('anomalyResults');
+      
+      const anomalies = [
+        {
+          date: '2024-12-15',
+          type: 'Temperature Spike',
+          severity: 'High',
+          description: 'Unusual temperature increase of 3.2°C detected at depth 500m'
+        },
+        {
+          date: '2024-12-10',
+          type: 'Salinity Drop',
+          severity: 'Medium',
+          description: 'Significant salinity decrease indicating possible freshwater influx'
+        },
+        {
+          date: '2024-12-08',
+          type: 'Oxygen Depletion',
+          severity: 'High',
+          description: 'Critical oxygen level drop detected in deep water layers'
+        }
+      ];
+      
+      anomalyResults.innerHTML = anomalies.map(anomaly => `
+        <div class="anomaly-item">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <strong style="color: #ef4444;">${anomaly.type}</strong>
+            <span style="background: ${anomaly.severity === 'High' ? '#ef4444' : '#f59e0b'}; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem;">${anomaly.severity}</span>
+          </div>
+          <div style="color: #64748b; font-size: 0.9rem; margin-bottom: 4px;">${anomaly.date}</div>
+          <div style="color: #1e293b;">${anomaly.description}</div>
+        </div>
+      `).join('');
+    }
+
+    function exportChart() {
+      if (predictionChart) {
+        const url = predictionChart.toBase64Image();
+        const link = document.createElement('a');
+        link.download = 'ocean-prediction-chart.png';
+        link.href = url;
+        link.click();
+      } else {
+        alert('No chart available to export');
+      }
+    }
+
+    function exportData() {
+      const predictionType = document.getElementById('predictionType').value;
+      const timeRange = document.getElementById('timeRange').value;
+      const oceanRegion = document.getElementById('oceanRegion').value;
+      
+      if (!predictionType || !timeRange || !oceanRegion) {
+        alert('Please run a prediction first');
+        return;
+      }
+      
+      // Generate CSV data
+      const csvContent = "data:text/csv;charset=utf-8," 
+        + "Date,Value,Type\n"
+        + "2024-12-01,20.5,Historical\n"
+        + "2024-12-02,20.8,Historical\n"
+        + "2024-12-03,21.2,Forecast\n"
+        + "2024-12-04,21.0,Forecast\n";
+      
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "ocean-prediction-data.csv");
+      link.click();
+    }
+  </script>
+
+  <!-- Chart.js for visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</body>
+</html>

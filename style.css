@@ -1,0 +1,298 @@
+/* =============================
+   General Reset & Base Styles
+============================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Poppins", Arial, sans-serif;
+  overflow-x: hidden;
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* =============================
+   HERO SECTION (Homepage)
+============================= */
+body.homepage {
+  color: white;
+  background: #0b0f19; /* dark navy */
+}
+
+.hero {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+#globe-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  padding: 20px;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  margin-bottom: 10px;
+}
+
+.hero p {
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+}
+
+/* Uiverse Button Styles */
+.buttons button {
+  padding: 1.3em 3em;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  font-weight: 500;
+  color: #000;
+  background-color: #fff;
+  border: none;
+  border-radius: 45px;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease 0s;
+  cursor: pointer;
+  outline: none;
+  margin: 10px;
+}
+
+.buttons button:hover {
+  background-color: #23c483;
+  box-shadow: 0px 15px 20px rgba(46, 229, 157, 0.4);
+  color: #fff;
+  transform: translateY(-7px);
+}
+
+.buttons button:active {
+  transform: translateY(-1px);
+}
+
+/* Shine Animation for Title */
+.btn-shine {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 12px 48px;
+  color: #fff;
+  background: linear-gradient(to right, #9f9f9f 0, #fff 10%, #868686 20%);
+  background-position: 0;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shine 3s infinite linear;
+  font-weight: 600;
+  font-size: 42px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+@keyframes shine {
+  0% {
+    background-position: 0;
+  }
+  60% {
+    background-position: 180px;
+  }
+  100% {
+    background-position: 180px;
+  }
+}
+
+/* =============================
+   NAVBAR (Shared across pages)
+============================= */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+  background: #ffffff;
+  border-bottom: 1px solid #ddd;
+}
+.logo {
+  font-weight: 700;
+  font-size: 20px;
+  color: #0077b6; /* ocean blue */
+}
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+.nav-links a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+}
+.nav-links a.active {
+  color: #0077b6;
+  border-bottom: 2px solid #0077b6;
+}
+
+/* =============================
+   FEATURES PAGE
+============================= */
+body.features {
+  background: #f9f9f7; /* off-white */
+  color: #222;
+}
+
+/* Features Layout */
+.features-section {
+  padding: 60px 40px;
+}
+.features-container {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 30px;
+  align-items: start;
+}
+
+/* Sidebar */
+.sidebar {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+.sidebar h3 {
+  margin-bottom: 15px;
+  color: #023e8a;
+}
+.btn-feature {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #e0f7fa;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.3s;
+  font-weight: 500;
+}
+.btn-feature span {
+  display: block;
+  font-size: 0.85rem;
+  color: #555;
+}
+.btn-feature:hover {
+  background: #b2ebf2;
+}
+
+/* Globe Box */
+.globe-box {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+.globe-label {
+  margin-bottom: 15px;
+  font-weight: 600;
+  color: #0077b6;
+}
+#globe-placeholder {
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e0f2f1;
+  border-radius: 10px;
+  font-size: 100px;
+}
+
+/* Info Panel */
+.info-panel {
+  background: #fff;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+.info-panel h2 {
+  color: #023e8a;
+  margin-bottom: 15px;
+}
+.info-buttons {
+  margin: 20px 0;
+}
+.btn-primary {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  background: #0077b6;
+  color: white;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: all 0.3s;
+}
+.btn-primary:hover {
+  background: #005f8a;
+}
+.btn-secondary {
+  padding: 12px 20px;
+  border: 1px solid #0077b6;
+  border-radius: 6px;
+  background: transparent;
+  color: #0077b6;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.btn-secondary:hover {
+  background: #0077b6;
+  color: #fff;
+}
+.stats {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+.stats div {
+  text-align: center;
+}
+
+/* About Section */
+.about-section {
+  padding: 60px 40px;
+  text-align: center;
+}
+.about-section h2 {
+  margin-bottom: 30px;
+  color: #023e8a;
+}
+.about-cards {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+.card h3 {
+  margin-bottom: 10px;
+  color: #0077b6;
+}

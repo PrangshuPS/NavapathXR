@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About | NAVPATHXR</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Footer Styles */
+    .footer {
+      background: #0f172a;
+      color: #94a3b8;
+      padding: 20px 0;
+      font-size: 0.9rem;
+      margin-top: 80px;
+    }
+
+    .footer-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .footer-left {
+      color: #cbd5e1;
+    }
+
+    .footer-right {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      color: #94a3b8;
+    }
+
+    .footer-divider {
+      color: #475569;
+      font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+      .footer-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+      }
+      
+      .footer-right {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .footer-divider {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body class="features">
+  <!-- ===== Navigation Bar ===== -->
+  <header class="navbar">
+    <div class="logo">NAVPATHXR</div>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="features.html">Features</a></li>
+        <li><a href="prediction.html">Prediction</a></li>
+        <li><a href="about.html" class="active">About</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- ===== About Hero Section ===== -->
+  <section class="features-section">
+    <div class="features-container">
+      <div class="info-panel" style="grid-column: 1 / -1; max-width: 800px; margin: 0 auto;">
+        <h2>About NAVPATHXR</h2>
+        <p>
+          NAVPATHXR's AI Explorer is a cutting-edge platform that democratizes access to ocean data through 
+          AI-powered tools and interactive visualizations. We make complex oceanographic information 
+          accessible to researchers, educators, and ocean enthusiasts worldwide.
+        </p>
+        <div class="info-buttons">
+          <button class="btn-primary" onclick="window.location.href='features.html'">Get Started</button>
+          <button class="btn-secondary">Contact Us</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Detailed About Section ===== -->
+  <section class="about-section">
+    <!-- <h2>Our Story</h2> -->
+    <div class="about-cards">
+      <div class="card">
+        <h3>What is NAVPATHXR?</h3>
+        <p>
+          NAVPATHXR is an AI-powered platform that lets you explore oceanographic data from ARGO floats using natural language queries and interactive dashboards.
+        </p>
+      </div>
+      <div class="card">
+        <h3>Where can I access the data?</h3>
+        <p>
+          The platform provides visualizations and insights from ARGO float datasets globally, with an initial focus on the Indian oceans. Users can explore profiles, trajectories, and parameter comparisons online.
+        </p>
+      </div>
+      <div class="card">
+        <h3>How does it work</h3>
+        <p>
+          NAVPATHXR ingests NetCDF data, stores structured data in relational and vector databases, and uses AI models with RAG pipelines to translate user queries into interactive visualizations and reports.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Team Section ===== -->
+  <section class="about-section">
+    <h2>Our Team</h2>
+    <div class="about-cards">
+      <div class="card">
+        <h3>Shreya</h3>
+        <p>
+          ----
+        </p>
+      </div>
+      <div class="card">
+        <h3>Nikita</h3>
+        <p>
+          ----
+        </p>
+      </div>
+      <div class="card">
+        <h3>Atharv</h3>
+        <p>
+          ----
+        </p>
+      </div>
+      <div class="card">
+        <h3>Swapneel</h3>
+        <p>
+          ----
+        </p>
+      </div>
+      <div class="card">
+        <h3>Priyanshu</h3>
+        <p>
+          ----
+        </p>
+      </div>
+      <div class="card">
+        <h3>Prangshu</h3>
+        <p>
+          ----
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Footer ===== -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-left">
+        <span>© 2025 NAVPATHXR. Powered by ARGO data.</span>
+      </div>
+      <div class="footer-right">
+        <span>contact@NAVPATHXR</span>
+        <span class="footer-divider">•</span>
+        <span>Project Credits: Team NAVPATHXR</span>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

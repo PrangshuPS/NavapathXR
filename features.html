@@ -1,0 +1,1923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visualization | Ocean AI Explorer</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Leaflet.js CSS for interactive maps -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    /* Visualization Section Styles */
+    .viz-section {
+      background: #f8fffe;
+      padding: 80px 0;
+      border-top: 1px solid #e0f2f1;
+    }
+
+    .viz-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .viz-header h2 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      color: #1e293b;
+    }
+
+    .viz-header .highlight {
+      color: #00d4aa;
+    }
+
+    .viz-header p {
+      font-size: 1.1rem;
+      color: #64748b;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .viz-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Visualization Tabs */
+    .viz-tabs {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 40px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .viz-tab {
+      background: #ffffff;
+      border: 2px solid #e2e8f0;
+      padding: 15px 30px;
+      border-radius: 25px;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1rem;
+      font-weight: 500;
+      min-width: 200px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .viz-tab.active {
+      background: #00d4aa;
+      color: #ffffff;
+      border-color: #00d4aa;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(0, 212, 170, 0.3);
+    }
+
+    .viz-tab:hover {
+      background: #f1f5f9;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .viz-tab.active:hover {
+      background: #00b894;
+    }
+
+    .tab-subtitle {
+      font-size: 0.8rem;
+      opacity: 0.8;
+      margin-top: 4px;
+      display: block;
+    }
+
+    /* Section Labels */
+    .section-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 30px;
+      padding: 0 40px;
+    }
+
+    .section-label {
+      color: #1e293b;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    /* Content Area */
+    .viz-content {
+      background: #ffffff;
+      border-radius: 15px;
+      padding: 40px;
+      margin-bottom: 40px;
+      min-height: 500px;
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e2e8f0;
+    }
+
+    .viz-panel {
+      display: none;
+    }
+
+    .viz-panel.active {
+      display: block;
+    }
+
+    /* Chart Styles */
+    .chart-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .chart-title {
+      font-size: 1.5rem;
+      color: #00d4aa;
+      font-weight: 600;
+    }
+
+    .chart-meta {
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+
+    .chart-container {
+      background: #f8fffe;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 1px solid #e0f2f1;
+    }
+
+    .chart-canvas {
+      width: 100%;
+      height: 300px;
+      border-radius: 8px;
+    }
+
+    .chart-stats {
+      display: flex;
+      gap: 40px;
+      margin-top: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .stat-item {
+      text-align: center;
+      color: #64748b;
+      font-size: 0.9rem;
+      padding: 10px 15px;
+      background: #f1f5f9;
+      border-radius: 8px;
+      min-width: 100px;
+    }
+
+    /* Heatmap Styles */
+    .heatmap-grid {
+      background: #f8fffe;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px 0;
+      border: 1px solid #e0f2f1;
+      height: 400px;
+    }
+
+    .heatmap-canvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 8px;
+    }
+
+    .heatmap-legend {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-top: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #64748b;
+      padding: 8px 15px;
+      background: #f1f5f9;
+      border-radius: 20px;
+      font-size: 0.9rem;
+    }
+
+    .legend-color {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+    }
+
+    /* Timeline Styles */
+    .timeline-legend {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+      justify-content: flex-start;
+      align-items: center;
+    }
+
+    .legend-timeline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+
+    .legend-line {
+      width: 30px;
+      height: 3px;
+      border-radius: 2px;
+    }
+
+    .legend-line.temp {
+      background: #00d4aa;
+    }
+
+    .legend-line.salinity {
+      background: #3b82f6;
+      border: 2px dashed #3b82f6;
+      height: 1px;
+    }
+
+    .timeline-stats {
+      display: flex;
+      gap: 40px;
+      margin-top: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .timeline-stat {
+      text-align: center;
+      color: #00d4aa;
+      font-size: 0.9rem;
+      padding: 10px 15px;
+      background: #f0fdfa;
+      border-radius: 8px;
+    }
+
+    /* ARGO Map Styles */
+    .map-section {
+      flex: 3;
+      background: #ffffff;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e2e8f0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .map-section h3 {
+      color: #1e293b;
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+
+    .argo-map-container {
+      position: relative;
+      width: 100%;
+      height: 500px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      z-index: 1;
+    }
+
+    /* Leaflet map specific styles */
+    .leaflet-container {
+      height: 100% !important;
+      width: 100% !important;
+      border-radius: 10px;
+      position: relative !important;
+    }
+
+    .leaflet-popup-content {
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .leaflet-popup-content strong {
+      color: #00d4aa;
+    }
+
+    /* Custom ARGO float markers */
+    .argo-marker {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 2px solid #ffffff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .argo-marker.active {
+      background-color: #00d4aa;
+      box-shadow: 0 0 15px rgba(0, 212, 170, 0.7);
+    }
+
+    .argo-marker.inactive {
+      background-color: #ef4444;
+      box-shadow: 0 0 15px rgba(239, 68, 68, 0.7);
+    }
+
+    .argo-marker:hover {
+      transform: scale(1.3);
+      z-index: 1000;
+    }
+
+    .argo-marker.active::after {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: -4px;
+      right: -4px;
+      bottom: -4px;
+      border: 2px solid #00d4aa;
+      border-radius: 50%;
+      opacity: 0.5;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 0.5; }
+    }
+
+    .map-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 1000;
+      border-radius: 10px;
+    }
+
+    .map-controls {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      display: flex;
+      gap: 8px;
+      pointer-events: all;
+    }
+
+    .map-btn {
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .map-btn.active {
+      background: #00d4aa;
+      color: #ffffff;
+    }
+
+    .map-btn:hover {
+      background: rgba(255, 255, 255, 1);
+      transform: translateY(-1px);
+    }
+
+    .map-btn.active:hover {
+      background: #00b894;
+    }
+
+    .map-info {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 8px 15px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      pointer-events: all;
+    }
+
+    .float-count {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .argo-float {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .argo-float.active {
+      background: #00d4aa;
+      border: 2px solid #ffffff;
+    }
+
+    .argo-float.inactive {
+      background: #ef4444;
+      border: 2px solid #ffffff;
+    }
+
+    .argo-float:hover {
+      transform: scale(1.5);
+      z-index: 10;
+    }
+
+    .float-tooltip {
+      position: absolute;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 0.8rem;
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 100;
+      transform: translate(-50%, -100%);
+      margin-top: -10px;
+    }
+
+    /* Update features container for new layout */
+    .features-section {
+      padding: 60px 40px;
+      overflow: hidden;
+    }
+
+    .features-container {
+      display: flex;
+      gap: 30px;
+      align-items: stretch;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Info Panel - Override style.css to make it smaller */
+    .info-panel {
+      flex: 1;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e2e8f0;
+    }
+
+    /* Footer Styles */
+    .footer {
+      background: #0f172a;
+      color: #94a3b8;
+      padding: 20px 0;
+      font-size: 0.9rem;
+      margin-top: 80px;
+    }
+
+    .footer-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .footer-left {
+      color: #cbd5e1;
+    }
+
+    .footer-right {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      color: #94a3b8;
+    }
+
+    .footer-divider {
+      color: #475569;
+      font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+      .footer-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+      }
+      
+      .footer-right {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .footer-divider {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body class="features">
+  <!-- ===== Navigation Bar ===== -->
+  <header class="navbar">
+    <div class="logo">NAVPATHXR</div>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="features.html" class="active">Visualization</a></li>
+        <li><a href="prediction.html">Prediction</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- ===== Main Features Section ===== -->
+  <section class="features-section">
+    <div class="features-container">
+
+      <!-- Interactive ARGO Map -->
+      <div class="map-section">
+        <h3>ARGO Float Network</h3>
+        <div id="argo-map" class="argo-map-container">
+          <div class="map-overlay">
+            <div class="map-controls">
+              <button class="map-btn active" data-layer="all">All Floats</button>
+              <button class="map-btn" data-layer="active">Active</button>
+              <button class="map-btn" data-layer="inactive">Inactive</button>
+            </div>
+            <div class="map-info">
+              <span class="float-count">10 Total Floats (7 Active)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Info Panel -->
+      <aside class="info-panel">
+        <h2>Explore the Ocean</h2>
+        <p>
+          Dive into the world’s largest dataset of ocean observations. Discover temperature patterns, 
+          currents, and marine ecosystems through AI-powered insights and interactive visualizations.
+        </p>
+        <div class="info-buttons">
+          <button class="btn-primary start-btn" onclick="window.open('https://incois.gov.in/OON/index.jsp', '_blank')">Start Exploring</button>
+          <button class="btn-secondary doc-btn">View Documentation</button>
+        </div>
+        <div class="stats">
+          <div><strong>3.6K+</strong><br>ARGO Floats</div>
+          <div><strong>30+</strong><br>Countries</div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ===== Ocean Data Visualizations Section ===== -->
+  <section class="viz-section">
+    <div class="viz-container">
+      <!-- Header -->
+      <div class="viz-header">
+        <h2>Ocean Data <span class="highlight">Visualizations</span></h2>
+        <p>Explore interactive charts, heatmaps, and timelines of ocean data. Switch between different visualization types to uncover patterns and insights.</p>
+      </div>
+
+      <!-- Visualization Tabs -->
+      <div class="viz-tabs">
+        <button class="viz-tab active" onclick="showTab('temperature')">
+          🌡️ Temperature
+          <span class="tab-subtitle">Ocean temperature variations</span>
+        </button>
+        <button class="viz-tab" onclick="showTab('heatmap')">
+          📊 Heatmap
+          <span class="tab-subtitle">Spatial temperature distribution</span>
+        </button>
+        <button class="viz-tab" onclick="showTab('timeline')">
+          📈 Timeline
+          <span class="tab-subtitle">Historical data trends</span>
+        </button>
+      </div>
+
+      <!-- Content Panels -->
+      <div class="viz-content">
+        <!-- Temperature Panel -->
+        <div class="viz-panel active" id="temperature-panel">
+          <div class="chart-info">
+            <div class="chart-title">Ocean Temperature Variations</div>
+            <div class="chart-meta">Last 24 hours</div>
+          </div>
+          <div class="chart-container">
+            <canvas id="temperatureChart" class="chart-canvas"></canvas>
+          </div>
+          <div class="chart-stats">
+            <div class="stat-item">Min: 12.3°C</div>
+            <div class="stat-item">Avg: 18.7°C</div>
+            <div class="stat-item">Max: 24.1°C</div>
+          </div>
+        </div>
+
+        <!-- Heatmap Panel -->
+        <div class="viz-panel" id="heatmap-panel">
+          <div class="chart-info">
+            <div class="chart-title">Temperature Heatmap</div>
+            <div class="chart-meta">Indian Ocean Region</div>
+          </div>
+          <div class="heatmap-grid">
+            <canvas id="heatmapChart" class="heatmap-canvas"></canvas>
+          </div>
+          <div class="heatmap-legend">
+            <div class="legend-item">
+              <div class="legend-color" style="background: #3b82f6;"></div>
+              <span>Cold (5°C)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background: #00d4aa;"></div>
+              <span>Moderate (15°C)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background: #f59e0b;"></div>
+              <span>Warm (25°C)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Timeline Panel -->
+        <div class="viz-panel" id="timeline-panel">
+          <div class="chart-info">
+            <div class="chart-title">Historical Trends</div>
+            <div class="chart-meta">2024 Annual Data</div>
+          </div>
+          <div class="timeline-legend">
+            <div class="legend-timeline">
+              <div class="legend-line temp"></div>
+              <span>Temperature (°C)</span>
+            </div>
+            <div class="legend-timeline">
+              <div class="legend-line salinity"></div>
+              <span>Salinity (PSU)</span>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="timelineChart" class="chart-canvas"></canvas>
+          </div>
+          <div class="timeline-stats">
+            <div class="timeline-stat">Temperature Range: 7°C - 25°C</div>
+            <div class="timeline-stat">Salinity Range: 33.2 - 37.8 PSU</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <script>
+    // Tab switching functionality
+    function showTab(tabName) {
+      // Hide all panels
+      document.querySelectorAll('.viz-panel').forEach(panel => panel.classList.remove('active'));
+      // Remove active class from all tabs
+      document.querySelectorAll('.viz-tab').forEach(tab => tab.classList.remove('active'));
+      
+      // Show selected panel
+      document.getElementById(tabName + '-panel').classList.add('active');
+      // Add active class to clicked tab
+      event.target.classList.add('active');
+    }
+
+    // Initialize charts when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      initTemperatureChart();
+      initHeatmapChart();
+      initTimelineChart();
+      initARGOMap();
+    });
+
+    // Temperature Chart Implementation
+    function initTemperatureChart() {
+      const canvas = document.getElementById('temperatureChart');
+      if (!canvas) return;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      // Set canvas size
+      canvas.width = canvas.offsetWidth;
+      canvas.height = 300;
+
+      const margin = 40;
+      const chartWidth = canvas.width - margin * 2;
+      const chartHeight = canvas.height - margin * 2;
+
+      // Generate realistic ARGO float temperature data for last 24 hours
+      const temperatureData = generateRealisticTemperatureData();
+      let hoveredDataPoint = null;
+
+      function generateRealisticTemperatureData() {
+        const data = [];
+        const hoursInDay = 24;
+        const baseTemp = 26.5; // Indian Ocean average
+        
+        for (let hour = 0; hour < hoursInDay; hour++) {
+          // Realistic daily temperature variation
+          // Coolest around 6 AM, warmest around 2 PM
+          const timeOfDay = hour / 24;
+          const dailyCycle = Math.sin((timeOfDay - 0.25) * Math.PI * 2) * 1.2;
+          
+          // Add depth variation simulation (surface mixing)
+          const depthVariation = Math.sin(hour * 0.5) * 0.8;
+          
+          // Add random measurement noise
+          const noise = (Math.random() - 0.5) * 0.4;
+          
+          // Tidal influence (very small for temperature)
+          const tidalEffect = Math.sin(hour * 0.52) * 0.2;
+          
+          const temperature = baseTemp + dailyCycle + depthVariation + noise + tidalEffect;
+          
+          data.push({
+            hour,
+            time: `${hour.toString().padStart(2, '0')}:00`,
+            temperature: Math.round(temperature * 100) / 100,
+            depth: 5 + Math.random() * 3, // Surface measurements 5-8m
+            salinity: 34.8 + Math.random() * 0.4 - 0.2,
+            floatId: `AD${6 + Math.floor(hour / 6)}` // Simulate different floats
+          });
+        }
+        
+        return data;
+      }
+
+      function drawTemperatureChart() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw background
+        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        gradient.addColorStop(0, '#f8fffe');
+        gradient.addColorStop(1, '#f0fdfa');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Draw grid
+        ctx.strokeStyle = "rgba(0, 212, 170, 0.2)";
+        ctx.lineWidth = 1;
+        
+        // Horizontal grid
+        for (let i = 0; i <= 8; i++) {
+          const y = margin + (i / 8) * chartHeight;
+          ctx.beginPath();
+          ctx.moveTo(margin, y);
+          ctx.lineTo(canvas.width - margin, y);
+          ctx.stroke();
+        }
+        
+        // Vertical grid (every 4 hours)
+        for (let i = 0; i <= 6; i++) {
+          const x = margin + (i / 6) * chartWidth;
+          ctx.beginPath();
+          ctx.moveTo(x, margin);
+          ctx.lineTo(x, canvas.height - margin);
+          ctx.stroke();
+        }
+
+        // Find min/max for scaling
+        const temps = temperatureData.map(d => d.temperature);
+        const minTemp = Math.min(...temps) - 0.5;
+        const maxTemp = Math.max(...temps) + 0.5;
+        const tempRange = maxTemp - minTemp;
+
+        // Draw temperature area fill
+        ctx.fillStyle = 'rgba(0, 212, 170, 0.2)';
+        ctx.beginPath();
+        temperatureData.forEach((point, i) => {
+          const x = margin + (i / (temperatureData.length - 1)) * chartWidth;
+          const y = margin + chartHeight - ((point.temperature - minTemp) / tempRange) * chartHeight;
+          if (i === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+          }
+        });
+        // Close the area
+        ctx.lineTo(margin + chartWidth, margin + chartHeight);
+        ctx.lineTo(margin, margin + chartHeight);
+        ctx.closePath();
+        ctx.fill();
+
+        // Draw temperature line
+        ctx.strokeStyle = "#00d4aa";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        temperatureData.forEach((point, i) => {
+          const x = margin + (i / (temperatureData.length - 1)) * chartWidth;
+          const y = margin + chartHeight - ((point.temperature - minTemp) / tempRange) * chartHeight;
+          if (i === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+          }
+        });
+        ctx.stroke();
+
+        // Draw data points with colors based on temperature
+        temperatureData.forEach((point, i) => {
+          const x = margin + (i / (temperatureData.length - 1)) * chartWidth;
+          const y = margin + chartHeight - ((point.temperature - minTemp) / tempRange) * chartHeight;
+          
+          const isHovered = hoveredDataPoint === i;
+          const radius = isHovered ? 6 : 4;
+          
+          // Color based on temperature relative to daily range
+          const tempColor = getTempPointColor(point.temperature, minTemp, maxTemp);
+          
+          ctx.fillStyle = tempColor;
+          ctx.beginPath();
+          ctx.arc(x, y, radius, 0, Math.PI * 2);
+          ctx.fill();
+          
+          // White border
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          
+          if (isHovered) {
+            // Add glow effect
+            ctx.shadowColor = tempColor;
+            ctx.shadowBlur = 8;
+            ctx.beginPath();
+            ctx.arc(x, y, radius + 2, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+          }
+        });
+
+        // Draw time labels (every 4 hours)
+        ctx.fillStyle = "#64748b";
+        ctx.font = "12px sans-serif";
+        ctx.textAlign = "center";
+        for (let i = 0; i < temperatureData.length; i += 4) {
+          const x = margin + (i / (temperatureData.length - 1)) * chartWidth;
+          ctx.fillText(temperatureData[i].time, x, canvas.height - 15);
+        }
+
+        // Draw Y-axis labels (temperature)
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#00d4aa";
+        for (let i = 0; i <= 4; i++) {
+          const temp = minTemp + (i / 4) * tempRange;
+          const y = margin + chartHeight - (i / 4) * chartHeight;
+          ctx.fillText(temp.toFixed(1) + "°C", margin - 10, y + 3);
+        }
+
+        // Draw chart title and info
+        ctx.fillStyle = "#1e293b";
+        ctx.font = "14px sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText("Surface Temperature Variations", margin, margin - 15);
+        
+        ctx.fillStyle = "#64748b";
+        ctx.font = "11px sans-serif";
+        ctx.fillText("Indian Ocean • ARGO Float Network • Real-time Data", margin, margin - 2);
+      }
+
+      function getTempPointColor(temp, minTemp, maxTemp) {
+        const normalizedTemp = (temp - minTemp) / (maxTemp - minTemp);
+        
+        if (normalizedTemp < 0.3) return "#3b82f6"; // Cool blue
+        if (normalizedTemp < 0.7) return "#00d4aa"; // Medium teal
+        return "#f59e0b"; // Warm orange
+      }
+
+      // Mouse interaction
+      function getMousePos(e) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top
+        };
+      }
+
+      function findNearestTempPoint(mouseX, mouseY) {
+        let nearest = null;
+        let minDistance = Infinity;
+        
+        const temps = temperatureData.map(d => d.temperature);
+        const minTemp = Math.min(...temps) - 0.5;
+        const maxTemp = Math.max(...temps) + 0.5;
+        const tempRange = maxTemp - minTemp;
+        
+        temperatureData.forEach((point, i) => {
+          const x = margin + (i / (temperatureData.length - 1)) * chartWidth;
+          const y = margin + chartHeight - ((point.temperature - minTemp) / tempRange) * chartHeight;
+          
+          const distance = Math.sqrt(Math.pow(mouseX - x, 2) + Math.pow(mouseY - y, 2));
+          if (distance < minDistance && distance < 25) {
+            minDistance = distance;
+            nearest = i;
+          }
+        });
+        
+        return nearest;
+      }
+
+      // Tooltip for temperature chart
+      let tempTooltip = null;
+
+      function showTempTooltip(x, y, pointIndex) {
+        if (!tempTooltip) {
+          tempTooltip = document.createElement('div');
+          tempTooltip.style.position = 'absolute';
+          tempTooltip.style.background = 'rgba(0, 0, 0, 0.9)';
+          tempTooltip.style.color = 'white';
+          tempTooltip.style.padding = '10px';
+          tempTooltip.style.borderRadius = '6px';
+          tempTooltip.style.fontSize = '12px';
+          tempTooltip.style.pointerEvents = 'none';
+          tempTooltip.style.zIndex = '1000';
+          tempTooltip.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+          document.body.appendChild(tempTooltip);
+        }
+
+        const point = temperatureData[pointIndex];
+        const date = new Date();
+        date.setHours(date.getHours() - (23 - point.hour));
+
+        tempTooltip.innerHTML = `
+          <div style="color: #00d4aa; font-weight: bold; margin-bottom: 4px;">
+            ${point.temperature}°C
+          </div>
+          <div style="color: #9ca3af; font-size: 11px; line-height: 1.3;">
+            Time: ${point.time}<br>
+            Float: ${point.floatId}<br>
+            Depth: ${point.depth.toFixed(1)}m<br>
+            Salinity: ${point.salinity.toFixed(2)} PSU
+          </div>
+        `;
+
+        tempTooltip.style.left = (x + 15) + 'px';
+        tempTooltip.style.top = (y - 15) + 'px';
+        tempTooltip.style.display = 'block';
+      }
+
+      function hideTempTooltip() {
+        if (tempTooltip) {
+          tempTooltip.style.display = 'none';
+        }
+      }
+
+      // Event listeners
+      canvas.addEventListener('mousemove', function(e) {
+        const pos = getMousePos(e);
+        const nearestPoint = findNearestTempPoint(pos.x, pos.y);
+        
+        if (nearestPoint !== null) {
+          hoveredDataPoint = nearestPoint;
+          showTempTooltip(e.clientX, e.clientY, nearestPoint);
+          canvas.style.cursor = 'pointer';
+        } else {
+          hoveredDataPoint = null;
+          hideTempTooltip();
+          canvas.style.cursor = 'default';
+        }
+        
+        drawTemperatureChart();
+      });
+
+      canvas.addEventListener('mouseleave', function() {
+        hoveredDataPoint = null;
+        hideTempTooltip();
+        canvas.style.cursor = 'default';
+        drawTemperatureChart();
+      });
+
+      // Initial draw
+      drawTemperatureChart();
+    }
+
+    // Advanced Premium Heatmap Chart Implementation - ULTRA HIGH QUALITY
+    function initHeatmapChart() {
+      const canvas = document.getElementById('heatmapChart');
+      if (!canvas) {
+        console.log("Heatmap canvas not found!");
+        return;
+      }
+
+      console.log("Initializing premium heatmap chart...");
+      
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        console.log("Failed to get 2D context!");
+        return;
+      }
+
+      // Get container dimensions
+      const container = canvas.parentElement;
+      const containerWidth = container.offsetWidth || 600;
+      const containerHeight = container.offsetHeight || 400;
+
+      // Set canvas size properly for ultra-crisp rendering
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = containerWidth * dpr;
+      canvas.height = containerHeight * dpr;
+      canvas.style.width = containerWidth + 'px';
+      canvas.style.height = containerHeight + 'px';
+      
+      // Scale context for high DPI displays with premium settings
+      ctx.scale(dpr, dpr);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+
+      // Working dimensions
+      const width = containerWidth;
+      const height = containerHeight;
+
+      // Grid parameters
+      const gridSize = 20;
+      const cols = Math.floor(width / gridSize);
+      const rows = Math.floor(height / gridSize);
+
+      // Track hover state
+      let hoveredCell = null;
+
+      // Generate realistic Indian Ocean temperature data
+      function generateRealisticOceanData() {
+        const data = [];
+        
+        for (let row = 0; row < rows; row++) {
+          data[row] = [];
+          for (let col = 0; col < cols; col++) {
+            // Latitude simulation (0 = north, 1 = south)
+            const latFactor = row / rows;
+            
+            // Longitude simulation (0 = west, 1 = east)
+            const lonFactor = col / cols;
+            
+            // Base temperature decreases from north to south
+            let baseTemp = 32 - (latFactor * 14); // 32°C at north, 18°C at south
+            
+            // Add monsoon influence (warmer in northern Bay of Bengal)
+            if (latFactor < 0.3 && lonFactor > 0.7) {
+              baseTemp += 2.5;
+            }
+            
+            // Add upwelling zones (cooler water along coasts)
+            if (lonFactor < 0.2 || lonFactor > 0.8) {
+              baseTemp -= Math.random() * 3;
+            }
+            
+            // Add Arabian Sea warming
+            if (latFactor < 0.4 && lonFactor < 0.4) {
+              baseTemp += 1.8;
+            }
+            
+            // Add equatorial warming
+            if (latFactor > 0.6 && latFactor < 0.8) {
+              baseTemp += 2;
+            }
+            
+            // Add realistic variation and seasonal patterns
+            baseTemp += (Math.sin(col * 0.2) + Math.cos(row * 0.15)) * 1.5;
+            baseTemp += Math.random() * 2 - 1;
+            
+            // Clamp to realistic range
+            data[row][col] = Math.max(15, Math.min(35, baseTemp));
+          }
+        }
+        
+        return data;
+      }
+
+      // Generate the ocean data
+      const oceanData = generateRealisticOceanData();
+
+      // Enhanced color mapping for ocean temperatures
+      function getTemperatureColor(temp) {
+        if (temp < 16) return '#1e3a8a'; // Deep blue (very cold)
+        if (temp < 18) return '#1d4ed8'; // Blue (cold)
+        if (temp < 20) return '#2563eb'; // Medium blue
+        if (temp < 22) return '#0ea5e9'; // Light blue
+        if (temp < 24) return '#06b6d4'; // Cyan (cool)
+        if (temp < 26) return '#00d4aa'; // Teal (moderate)
+        if (temp < 28) return '#10b981'; // Green (warm)
+        if (temp < 30) return '#65a30d'; // Yellow-green
+        if (temp < 32) return '#f59e0b'; // Orange (hot)
+        return '#dc2626'; // Red (very hot)
+      }
+
+      function getTemperatureLabel(temp) {
+        if (temp < 18) return 'Very Cold';
+        if (temp < 22) return 'Cold';
+        if (temp < 26) return 'Moderate';
+        if (temp < 30) return 'Warm';
+        return 'Very Warm';
+      }
+
+      function drawHeatmap() {
+        ctx.clearRect(0, 0, width, height);
+
+        // Draw background gradient
+        const gradient = ctx.createLinearGradient(0, 0, 0, height);
+        gradient.addColorStop(0, '#f8fffe');
+        gradient.addColorStop(1, '#f0fdfa');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+
+        // Draw temperature cells
+        for (let row = 0; row < rows; row++) {
+          for (let col = 0; col < cols; col++) {
+            const x = col * gridSize;
+            const y = row * gridSize;
+            const temp = oceanData[row][col];
+
+            // Get color based on temperature
+            const color = getTemperatureColor(temp);
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, gridSize - 1, gridSize - 1);
+
+            // Highlight hovered cell
+            if (hoveredCell && hoveredCell.col === col && hoveredCell.row === row) {
+              ctx.strokeStyle = '#ffffff';
+              ctx.lineWidth = 3;
+              ctx.strokeRect(x - 1, y - 1, gridSize + 1, gridSize + 1);
+              
+              // Add glow effect
+              ctx.shadowColor = color;
+              ctx.shadowBlur = 8;
+              ctx.strokeRect(x - 2, y - 2, gridSize + 3, gridSize + 3);
+              ctx.shadowBlur = 0;
+            }
+          }
+        }
+
+        // Draw subtle grid lines
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+        ctx.lineWidth = 0.5;
+        for (let i = 0; i <= cols; i++) {
+          ctx.beginPath();
+          ctx.moveTo(i * gridSize, 0);
+          ctx.lineTo(i * gridSize, height);
+          ctx.stroke();
+        }
+        for (let i = 0; i <= rows; i++) {
+          ctx.beginPath();
+          ctx.moveTo(0, i * gridSize);
+          ctx.lineTo(width, i * gridSize);
+          ctx.stroke();
+        }
+
+        // Draw title and info
+        ctx.fillStyle = "#1e293b";
+        ctx.font = "bold 16px Arial";
+        ctx.textAlign = "left";
+        ctx.fillText("Indian Ocean Temperature Distribution", 15, 25);
+        
+        ctx.fillStyle = "#64748b";
+        ctx.font = "12px Arial";
+        ctx.fillText("Real-time ARGO Float Data • Hover for details", 15, 45);
+      }
+
+      // Mouse interaction
+      function getMousePos(e) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+          x: (e.clientX - rect.left) * (width / rect.width),
+          y: (e.clientY - rect.top) * (height / rect.height)
+        };
+      }
+
+      // Tooltip element
+      let heatmapTooltip = null;
+
+      function showHeatmapTooltip(x, y, temp, gridCol, gridRow) {
+        if (!heatmapTooltip) {
+          heatmapTooltip = document.createElement('div');
+          heatmapTooltip.style.position = 'absolute';
+          heatmapTooltip.style.background = 'rgba(0, 0, 0, 0.9)';
+          heatmapTooltip.style.color = 'white';
+          heatmapTooltip.style.padding = '12px';
+          heatmapTooltip.style.borderRadius = '8px';
+          heatmapTooltip.style.fontSize = '13px';
+          heatmapTooltip.style.pointerEvents = 'none';
+          heatmapTooltip.style.zIndex = '1000';
+          heatmapTooltip.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+          heatmapTooltip.style.maxWidth = '200px';
+          document.body.appendChild(heatmapTooltip);
+        }
+
+        // Convert grid position to approximate coordinates
+        const lat = 25 - (gridRow / rows) * 35; // 25°N to -10°S
+        const lon = 40 + (gridCol / cols) * 60; // 40°E to 100°E
+
+        // Simulate additional ocean parameters
+        const salinity = 34.2 + Math.random() * 1.2;
+        const depth = Math.floor(Math.random() * 2500 + 500);
+        const oxygenLevel = 3.5 + Math.random() * 2;
+
+        heatmapTooltip.innerHTML = `
+          <div style="border-bottom: 1px solid #374151; margin-bottom: 8px; padding-bottom: 8px;">
+            <strong style="color: #00d4aa;">Temperature: ${temp.toFixed(1)}°C</strong>
+          </div>
+          <div style="color: #9ca3af; font-size: 11px; line-height: 1.4;">
+            Coordinates: ${lat.toFixed(1)}°, ${lon.toFixed(1)}°<br>
+            Status: ${getTemperatureLabel(temp)}<br>
+            Salinity: ${salinity.toFixed(1)} PSU<br>
+            Depth: ${depth}m<br>
+            Oxygen: ${oxygenLevel.toFixed(1)} mg/L
+          </div>
+        `;
+
+        heatmapTooltip.style.left = (x + 15) + 'px';
+        heatmapTooltip.style.top = (y - 15) + 'px';
+        heatmapTooltip.style.display = 'block';
+      }
+
+      function hideHeatmapTooltip() {
+        if (heatmapTooltip) {
+          heatmapTooltip.style.display = 'none';
+        }
+      }
+
+      // Event listeners
+      canvas.addEventListener('mousemove', function(e) {
+        const pos = getMousePos(e);
+        const gridCol = Math.floor(pos.x / gridSize);
+        const gridRow = Math.floor(pos.y / gridSize);
+
+        if (gridCol >= 0 && gridCol < cols && gridRow >= 0 && gridRow < rows) {
+          hoveredCell = { col: gridCol, row: gridRow };
+          const temp = oceanData[gridRow][gridCol];
+          showHeatmapTooltip(e.clientX, e.clientY, temp, gridCol, gridRow);
+          canvas.style.cursor = 'pointer';
+        } else {
+          hoveredCell = null;
+          hideHeatmapTooltip();
+          canvas.style.cursor = 'default';
+        }
+        
+        drawHeatmap();
+      });
+
+      canvas.addEventListener('mouseleave', function() {
+        hoveredCell = null;
+        hideHeatmapTooltip();
+        canvas.style.cursor = 'default';
+        drawHeatmap();
+      });
+
+      // Initial draw
+      drawHeatmap();
+
+      console.log("Fixed heatmap chart initialized successfully!");
+    }
+
+
+    // Timeline Chart Implementation - FIXED RENDERING
+    function initTimelineChart() {
+      const canvas = document.getElementById('timelineChart');
+      if (!canvas) {
+        console.log("Timeline canvas not found!");
+        return;
+      }
+
+      console.log("Initializing fixed timeline chart...");
+      
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        console.log("Failed to get 2D context!");
+        return;
+      }
+
+      // Get container dimensions
+      const container = canvas.parentElement;
+      const containerWidth = container.offsetWidth || 600;
+      const containerHeight = 300;
+
+      // Set canvas size properly for crisp rendering
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = containerWidth * dpr;
+      canvas.height = containerHeight * dpr;
+      canvas.style.width = containerWidth + 'px';
+      canvas.style.height = containerHeight + 'px';
+      
+      // Scale context for high DPI displays
+      ctx.scale(dpr, dpr);
+
+      // Working dimensions
+      const width = containerWidth;
+      const height = containerHeight;
+
+      const margin = 50;
+      const chartWidth = width - margin * 2;
+      const chartHeight = height - margin * 2;
+
+      // Track mouse interaction
+      let hoveredPoint = null;
+
+      // Generate realistic 2024 Indian Ocean oceanographic data
+      function generateRealisticTimelineData() {
+        const data = [];
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        
+        // Indian Ocean seasonal patterns based on real oceanographic data
+        months.forEach((month, i) => {
+          // Temperature patterns (monsoon and seasonal influence)
+          let baseTemp = 26.5; // Average Indian Ocean surface temperature
+          
+          // Seasonal variation (warmer during SW monsoon May-Sep)
+          if (i >= 4 && i <= 8) { // May to September (SW Monsoon)
+            baseTemp += 1.5 + Math.sin((i - 4) / 4 * Math.PI) * 1.2;
+          } else if (i >= 10 || i <= 1) { // Nov-Feb (NE Monsoon)
+            baseTemp -= 0.8 + Math.cos(i / 3 * Math.PI) * 0.8;
+          }
+          
+          // Add El Niño/La Niña influence (subtle)
+          baseTemp += Math.sin(i / 12 * Math.PI * 2.5) * 0.6;
+          
+          // Add realistic measurement variation
+          const temperature = baseTemp + (Math.random() - 0.5) * 1.2;
+          
+          // Salinity patterns (fresher during monsoon due to rainfall/runoff)
+          let baseSalinity = 35.1; // Average Indian Ocean surface salinity
+          
+          // Monsoon freshening (more rainfall = lower salinity)
+          if (i >= 5 && i <= 9) { // June to October
+            baseSalinity -= 0.6 + Math.sin((i - 5) / 4 * Math.PI) * 0.4;
+          }
+          
+          // Bay of Bengal influence (fresher in northern regions)
+          baseSalinity -= 0.2;
+          
+          // Add realistic variation
+          const salinity = baseSalinity + (Math.random() - 0.5) * 0.3;
+          
+          // Dissolved oxygen (inverse relationship with temperature, biological activity)
+          let baseOxygen = 4.8;
+          baseOxygen += (27 - temperature) * 0.12; // Higher in cooler water
+          
+          // Biological activity (lower oxygen during bloom seasons)
+          if (i >= 2 && i <= 4) { // Mar-May (spring bloom)
+            baseOxygen -= 0.3;
+          }
+          if (i >= 8 && i <= 10) { // Sep-Nov (autumn bloom)
+            baseOxygen -= 0.2;
+          }
+          
+          // Add measurement variation
+          const oxygen = baseOxygen + (Math.random() - 0.5) * 0.4;
+          
+          data.push({
+            month,
+            monthIndex: i,
+            temperature: Math.round(temperature * 10) / 10,
+            salinity: Math.round(salinity * 100) / 100,
+            oxygen: Math.round(oxygen * 10) / 10,
+            // Additional realistic parameters
+            chlorophyll: 0.12 + Math.random() * 0.18 + (i >= 2 && i <= 4 ? 0.15 : 0), // Spring bloom
+            depth: 8 + Math.random() * 4, // Surface measurements
+            pressure: 1012 + Math.random() * 8 - 4, // Atmospheric pressure
+            windSpeed: 3 + Math.random() * 12 + (i >= 5 && i <= 9 ? 4 : 0) // Higher during monsoon
+          });
+        });
+        
+        return data;
+      }
+
+      // Generate the ocean timeline data
+      const oceanTimeline = generateRealisticTimelineData();
+
+      function drawTimeline() {
+        ctx.clearRect(0, 0, width, height);
+
+        // Draw background gradient
+        const gradient = ctx.createLinearGradient(0, 0, 0, height);
+        gradient.addColorStop(0, '#f8fffe');
+        gradient.addColorStop(1, '#f0fdfa');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+
+        // Draw grid
+        ctx.strokeStyle = "rgba(0, 212, 170, 0.15)";
+        ctx.lineWidth = 1;
+        
+        // Horizontal grid lines
+        for (let i = 0; i <= 10; i++) {
+          const y = margin + (i / 10) * chartHeight;
+          ctx.beginPath();
+          ctx.moveTo(margin, y);
+          ctx.lineTo(width - margin, y);
+          ctx.stroke();
+        }
+        
+        // Vertical grid lines
+        for (let i = 0; i < oceanTimeline.length; i++) {
+          const x = margin + (i / (oceanTimeline.length - 1)) * chartWidth;
+          ctx.beginPath();
+          ctx.moveTo(x, margin);
+          ctx.lineTo(x, height - margin);
+          ctx.stroke();
+        }
+
+        // Draw temperature line and area
+        drawDataLine(oceanTimeline, 'temperature', '#00d4aa', 24, 30, true);
+        
+        // Draw salinity line
+        drawDataLine(oceanTimeline, 'salinity', '#3b82f6', 33.5, 36, false, [5, 5]);
+        
+        // Draw oxygen line
+        drawDataLine(oceanTimeline, 'oxygen', '#f59e0b', 3.5, 6, false, [10, 5]);
+
+        // Draw data points with hover effects
+        oceanTimeline.forEach((point, i) => {
+          const x = margin + (i / (oceanTimeline.length - 1)) * chartWidth;
+          
+          // Temperature points
+          const tempY = margin + chartHeight - ((point.temperature - 24) / 6) * chartHeight;
+          drawPoint(x, tempY, '#00d4aa', i, 'temperature', point);
+          
+          // Salinity points
+          const salinityY = margin + chartHeight - ((point.salinity - 33.5) / 2.5) * chartHeight;
+          drawPoint(x, salinityY, '#3b82f6', i, 'salinity', point);
+          
+          // Oxygen points
+          const oxygenY = margin + chartHeight - ((point.oxygen - 3.5) / 2.5) * chartHeight;
+          drawPoint(x, oxygenY, '#f59e0b', i, 'oxygen', point);
+        });
+
+        // Draw month labels
+        ctx.fillStyle = "#64748b";
+        ctx.font = "12px sans-serif";
+        ctx.textAlign = "center";
+        oceanTimeline.forEach((point, i) => {
+          const x = margin + (i / (oceanTimeline.length - 1)) * chartWidth;
+          ctx.fillText(point.month, x, height - 15);
+        });
+
+        // Draw y-axis labels
+        ctx.textAlign = "right";
+        ctx.font = "10px sans-serif";
+        
+        // Temperature axis (left)
+        ctx.fillStyle = "#00d4aa";
+        for (let i = 0; i <= 4; i++) {
+          const temp = 24 + (i * 1.5);
+          const y = margin + chartHeight - (i / 4) * chartHeight;
+          ctx.fillText(temp.toFixed(1) + "°C", margin - 10, y + 3);
+        }
+        
+        // Salinity axis (right)
+        ctx.fillStyle = "#3b82f6";
+        ctx.textAlign = "left";
+        for (let i = 0; i <= 4; i++) {
+          const sal = 33.5 + (i * 0.625);
+          const y = margin + chartHeight - (i / 4) * chartHeight;
+          ctx.fillText(sal.toFixed(1) + " PSU", width - margin + 10, y + 3);
+        }
+
+        // Draw chart title and info
+        ctx.fillStyle = "#1e293b";
+        ctx.font = "bold 16px sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText("2024 Indian Ocean Oceanographic Trends", margin, margin - 15);
+        
+        ctx.fillStyle = "#64748b";
+        ctx.font = "11px sans-serif";
+        ctx.fillText("Multi-parameter ARGO Float Data • Hover for details", margin, margin - 2);
+
+        // Draw enhanced legend
+        drawEnhancedLegend();
+      }
+
+      function drawDataLine(data, property, color, minVal, maxVal, fillArea = false, dashPattern = null) {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = fillArea ? 3 : 2;
+        
+        if (dashPattern) {
+          ctx.setLineDash(dashPattern);
+        } else {
+          ctx.setLineDash([]);
+        }
+
+        // Draw area fill if requested
+        if (fillArea) {
+          ctx.fillStyle = color + '20'; // Add transparency
+          ctx.beginPath();
+          data.forEach((point, i) => {
+            const x = margin + (i / (data.length - 1)) * chartWidth;
+            const y = margin + chartHeight - ((point[property] - minVal) / (maxVal - minVal)) * chartHeight;
+            if (i === 0) {
+              ctx.moveTo(x, y);
+            } else {
+              ctx.lineTo(x, y);
+            }
+          });
+          // Close the area
+          ctx.lineTo(margin + chartWidth, margin + chartHeight);
+          ctx.lineTo(margin, margin + chartHeight);
+          ctx.closePath();
+          ctx.fill();
+        }
+
+        // Draw line
+        ctx.beginPath();
+        data.forEach((point, i) => {
+          const x = margin + (i / (data.length - 1)) * chartWidth;
+          const y = margin + chartHeight - ((point[property] - minVal) / (maxVal - minVal)) * chartHeight;
+          if (i === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+          }
+        });
+        ctx.stroke();
+      }
+
+      function drawPoint(x, y, color, index, type, data) {
+        const isHovered = hoveredPoint && hoveredPoint.index === index && hoveredPoint.type === type;
+        const radius = isHovered ? 6 : 4;
+        
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Add white border for visibility
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        
+        if (isHovered) {
+          // Add glow effect
+          ctx.shadowColor = color;
+          ctx.shadowBlur = 10;
+          ctx.beginPath();
+          ctx.arc(x, y, radius + 2, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+        }
+      }
+
+      function drawEnhancedLegend() {
+        const legendX = margin + 20;
+        const legendY = margin + 20;
+        
+        // Legend background
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+        ctx.fillRect(legendX - 10, legendY - 10, 220, 75);
+        ctx.strokeStyle = 'rgba(0, 212, 170, 0.3)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(legendX - 10, legendY - 10, 220, 75);
+        
+        // Legend items
+        const legends = [
+          { color: '#00d4aa', label: 'Temperature (°C)', pattern: null },
+          { color: '#3b82f6', label: 'Salinity (PSU)', pattern: [5, 5] },
+          { color: '#f59e0b', label: 'Oxygen (mg/L)', pattern: [10, 5] }
+        ];
+        
+        legends.forEach((legend, i) => {
+          const y = legendY + i * 18;
+          
+          // Draw line sample
+          ctx.strokeStyle = legend.color;
+          ctx.lineWidth = 2;
+          if (legend.pattern) {
+            ctx.setLineDash(legend.pattern);
+          } else {
+            ctx.setLineDash([]);
+          }
+          ctx.beginPath();
+          ctx.moveTo(legendX, y);
+          ctx.lineTo(legendX + 25, y);
+          ctx.stroke();
+          
+          // Draw point sample
+          ctx.fillStyle = legend.color;
+          ctx.beginPath();
+          ctx.arc(legendX + 12, y, 3, 0, Math.PI * 2);
+          ctx.fill();
+          
+          // Draw label
+          ctx.fillStyle = '#1e293b';
+          ctx.font = '12px sans-serif';
+          ctx.textAlign = 'left';
+          ctx.fillText(legend.label, legendX + 35, y + 4);
+        });
+        
+        ctx.setLineDash([]); // Reset dash pattern
+      }
+
+      // Mouse interaction
+      function getMousePos(e) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+          x: (e.clientX - rect.left) * (width / rect.width),
+          y: (e.clientY - rect.top) * (height / rect.height)
+        };
+      }
+
+      function findNearestPoint(mouseX, mouseY) {
+        let nearest = null;
+        let minDistance = Infinity;
+        
+        oceanTimeline.forEach((point, i) => {
+          const x = margin + (i / (oceanTimeline.length - 1)) * chartWidth;
+          
+          // Check temperature point
+          const tempY = margin + chartHeight - ((point.temperature - 24) / 6) * chartHeight;
+          const tempDist = Math.sqrt(Math.pow(mouseX - x, 2) + Math.pow(mouseY - tempY, 2));
+          if (tempDist < minDistance && tempDist < 25) {
+            minDistance = tempDist;
+            nearest = { index: i, type: 'temperature', data: point, x, y: tempY };
+          }
+          
+          // Check salinity point
+          const salinityY = margin + chartHeight - ((point.salinity - 33.5) / 2.5) * chartHeight;
+          const salinityDist = Math.sqrt(Math.pow(mouseX - x, 2) + Math.pow(mouseY - salinityY, 2));
+          if (salinityDist < minDistance && salinityDist < 25) {
+            minDistance = salinityDist;
+            nearest = { index: i, type: 'salinity', data: point, x, y: salinityY };
+          }
+          
+          // Check oxygen point
+          const oxygenY = margin + chartHeight - ((point.oxygen - 3.5) / 2.5) * chartHeight;
+          const oxygenDist = Math.sqrt(Math.pow(mouseX - x, 2) + Math.pow(mouseY - oxygenY, 2));
+          if (oxygenDist < minDistance && oxygenDist < 25) {
+            minDistance = oxygenDist;
+            nearest = { index: i, type: 'oxygen', data: point, x, y: oxygenY };
+          }
+        });
+        
+        return nearest;
+      }
+
+      // Tooltip for timeline
+      let timelineTooltip = null;
+
+      function showTimelineTooltip(x, y, pointData) {
+        if (!timelineTooltip) {
+          timelineTooltip = document.createElement('div');
+          timelineTooltip.style.position = 'absolute';
+          timelineTooltip.style.background = 'rgba(0, 0, 0, 0.9)';
+          timelineTooltip.style.color = 'white';
+          timelineTooltip.style.padding = '12px';
+          timelineTooltip.style.borderRadius = '8px';
+          timelineTooltip.style.fontSize = '13px';
+          timelineTooltip.style.pointerEvents = 'none';
+          timelineTooltip.style.zIndex = '1000';
+          timelineTooltip.style.maxWidth = '220px';
+          timelineTooltip.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+          document.body.appendChild(timelineTooltip);
+        }
+
+        const typeLabels = {
+          temperature: 'Sea Surface Temperature',
+          salinity: 'Sea Surface Salinity',
+          oxygen: 'Dissolved Oxygen'
+        };
+
+        const units = {
+          temperature: '°C',
+          salinity: 'PSU',
+          oxygen: 'mg/L'
+        };
+
+        const colors = {
+          temperature: '#00d4aa',
+          salinity: '#3b82f6',
+          oxygen: '#f59e0b'
+        };
+
+        timelineTooltip.innerHTML = `
+          <div style="border-bottom: 1px solid #374151; margin-bottom: 8px; padding-bottom: 8px;">
+            <strong>${pointData.data.month} 2024</strong>
+          </div>
+          <div style="color: ${colors[pointData.type]}; font-weight: bold; margin-bottom: 6px;">
+            ${typeLabels[pointData.type]}: ${pointData.data[pointData.type]}${units[pointData.type]}
+          </div>
+          <div style="color: #9ca3af; font-size: 11px; line-height: 1.4;">
+            Temperature: ${pointData.data.temperature}°C<br>
+            Salinity: ${pointData.data.salinity} PSU<br>
+            Oxygen: ${pointData.data.oxygen} mg/L<br>
+            Chlorophyll: ${pointData.data.chlorophyll.toFixed(2)} mg/m³<br>
+            Wind Speed: ${pointData.data.windSpeed.toFixed(1)} m/s
+          </div>
+        `;
+
+        timelineTooltip.style.left = (x + 15) + 'px';
+        timelineTooltip.style.top = (y - 15) + 'px';
+        timelineTooltip.style.display = 'block';
+      }
+
+      function hideTimelineTooltip() {
+        if (timelineTooltip) {
+          timelineTooltip.style.display = 'none';
+        }
+      }
+
+      // Event listeners
+      canvas.addEventListener('mousemove', function(e) {
+        const pos = getMousePos(e);
+        const nearestPoint = findNearestPoint(pos.x, pos.y);
+        
+        if (nearestPoint) {
+          hoveredPoint = nearestPoint;
+          showTimelineTooltip(e.clientX, e.clientY, nearestPoint);
+          canvas.style.cursor = 'pointer';
+        } else {
+          hoveredPoint = null;
+          hideTimelineTooltip();
+          canvas.style.cursor = 'default';
+        }
+        
+        drawTimeline();
+      });
+
+      canvas.addEventListener('mouseleave', function() {
+        hoveredPoint = null;
+        hideTimelineTooltip();
+        canvas.style.cursor = 'default';
+        drawTimeline();
+      });
+
+      // Initial draw
+      drawTimeline();
+
+      console.log("Fixed timeline chart initialized successfully!");
+    }
+
+
+    // ARGO Map Implementation with Leaflet.js
+    function initARGOMap() {
+      const mapContainer = document.getElementById('argo-map');
+      if (!mapContainer) return;
+
+      // Initialize Leaflet map centered on Indian Ocean
+      const map = L.map('argo-map', {
+        center: [15, 80], // Center on Indian Ocean
+        zoom: 5,
+        minZoom: 4,
+        maxZoom: 10
+      });
+
+      // Add OpenStreetMap tiles
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+
+      // ARGO float data for Indian Ocean region
+      const argoFloats = [
+        { id: 'AD06', lat: 18.5, lon: 68.2, status: 'active', name: 'AD06', temp: '24.5°C', depth: '2000m' },
+        { id: 'AD08', lat: 8.7, lon: 65.1, status: 'active', name: 'AD08', temp: '26.1°C', depth: '1800m' },
+        { id: 'BD10', lat: 20.2, lon: 88.5, status: 'active', name: 'BD10', temp: '23.8°C', depth: '2200m' },
+        { id: 'BD11', lat: 16.8, lon: 85.3, status: 'active', name: 'BD11', temp: '25.2°C', depth: '1950m' },
+        { id: 'BD12', lat: 10.4, lon: 95.1, status: 'active', name: 'BD12', temp: '27.3°C', depth: '1750m' },
+        { id: 'BD13', lat: 18.9, lon: 90.2, status: 'active', name: 'BD13', temp: '24.1°C', depth: '2100m' },
+        { id: 'BD14', lat: 5.6, lon: 88.7, status: 'active', name: 'BD14', temp: '28.0°C', depth: '1650m' },
+        { id: 'CB01', lat: 12.3, lon: 97.4, status: 'inactive', name: 'CB01', temp: 'N/A', depth: 'N/A' },
+        { id: 'CB02', lat: 10.8, lon: 70.6, status: 'inactive', name: 'CB02', temp: 'N/A', depth: 'N/A' },
+        { id: 'CA010', lat: 11.5, lon: 72.3, status: 'inactive', name: 'CA010', temp: 'N/A', depth: 'N/A' }
+      ];
+
+      let currentFilter = 'all';
+      let markers = [];
+
+      // Custom marker icons
+      function createCustomIcon(status) {
+        const color = status === 'active' ? '#00d4aa' : '#ef4444';
+        return L.divIcon({
+          className: 'custom-div-icon',
+          html: `<div class="argo-marker ${status}"></div>`,
+          iconSize: [12, 12],
+          iconAnchor: [6, 6]
+        });
+      }
+
+      function addMarkersToMap() {
+        // Clear existing markers
+        markers.forEach(marker => map.removeLayer(marker));
+        markers = [];
+
+        // Filter floats based on current filter
+        let filteredFloats = argoFloats;
+        if (currentFilter !== 'all') {
+          filteredFloats = argoFloats.filter(float => float.status === currentFilter);
+        }
+
+        // Add filtered markers to map
+        filteredFloats.forEach(float => {
+          const marker = L.marker([float.lat, float.lon], {
+            icon: createCustomIcon(float.status)
+          }).addTo(map);
+
+          // Create popup content
+          const popupContent = `
+            <div style="font-family: Arial, sans-serif;">
+              <strong>${float.name}</strong><br>
+              <strong>Status:</strong> ${float.status}<br>
+              <strong>Temperature:</strong> ${float.temp}<br>
+              <strong>Depth:</strong> ${float.depth}<br>
+              <strong>Coordinates:</strong> ${float.lat.toFixed(2)}°N, ${float.lon.toFixed(2)}°E
+            </div>
+          `;
+
+          marker.bindPopup(popupContent);
+          markers.push(marker);
+        });
+
+        // Update counter
+        updateFloatCounter();
+      }
+
+      function updateFloatCounter() {
+        const activeCount = argoFloats.filter(f => f.status === 'active').length;
+        const totalCount = argoFloats.length;
+        const floatCountEl = document.querySelector('.float-count');
+        
+        if (floatCountEl) {
+          if (currentFilter === 'all') {
+            floatCountEl.textContent = `${totalCount} Total Floats (${activeCount} Active)`;
+          } else if (currentFilter === 'active') {
+            floatCountEl.textContent = `${activeCount} Active Floats`;
+          } else {
+            floatCountEl.textContent = `${totalCount - activeCount} Inactive Floats`;
+          }
+        }
+      }
+
+      // Add filter button event listeners
+      const filterButtons = document.querySelectorAll('.map-btn');
+      filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          // Remove active class from all buttons
+          filterButtons.forEach(btn => btn.classList.remove('active'));
+          // Add active class to clicked button
+          this.classList.add('active');
+          // Update filter
+          currentFilter = this.dataset.layer;
+          // Re-render markers
+          addMarkersToMap();
+        });
+      });
+
+      // Initial load
+      addMarkersToMap();
+
+      // Set map bounds to focus on Indian Ocean region
+      const bounds = L.latLngBounds([
+        [0, 60],   // Southwest coordinates
+        [25, 100]  // Northeast coordinates
+      ]);
+      map.fitBounds(bounds);
+    }
+
+    // Resize charts when window resizes
+    window.addEventListener('resize', function() {
+      setTimeout(() => {
+        initTemperatureChart();
+        initHeatmapChart();
+        initTimelineChart();
+      }, 100);
+    });
+  </script>
+
+  <!-- ===== Footer ===== -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-left">
+        <span>© 2025 NAVPATHXR. Powered by ARGO data.</span>
+      </div>
+      <div class="footer-right">
+        <span>contact@NAVPATHXR</span>
+        <span class="footer-divider">•</span>
+        <span>Project Credits: Team NAVPATHXR</span>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
