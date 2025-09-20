@@ -19,10 +19,10 @@ Oceanographic data is vast, complex, and often difficult to access. The ARGO pro
 ---
 
 ## Technology Stack
-- **Backend:** Python, PostgreSQL, FAISS/Chroma vector database  
-- **AI:** Large Language Models (GPT, QWEN, LLaMA) with RAG pipelines  
-- **Frontend:** Streamlit / Dash, Plotly, Leaflet, Cesium  
-- **Data Format:** NetCDF, CSV, Parquet  
+- **Backend:** Python, FastAPI, SQL 
+- **AI:**  Sonoma Sky Alpha
+- **Frontend:** HTML, CSS, Js, TypeScript  
+- **Data Format:** Vector, CSV 
 
 ---
 
