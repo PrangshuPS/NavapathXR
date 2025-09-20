@@ -129,7 +129,7 @@ body.homepage {
 .logo {
   font-weight: 700;
   font-size: 20px;
-  color: #0077b6; /* ocean blue */
+  color: #00d4aa; 
 }
 .nav-links {
   list-style: none;
@@ -296,3 +296,4 @@ body.features {
   margin-bottom: 10px;
   color: #0077b6;
 }
+
